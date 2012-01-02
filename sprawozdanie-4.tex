@@ -1,0 +1,109 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[a4paper]{geometry}
+
+\usepackage{polski}
+\usepackage{xltxtra}
+\usepackage{indentfirst}
+\usepackage{relsize}
+\usepackage{fancyvrb}
+\usepackage{hyperref}
+\hypersetup{
+    pdftitle={Sprawozdanie z ćwiczenia nr 4 z laboratorium Programowanie internetowe},%
+    pdfauthor={Tomasz Cudziło},%
+    colorlinks=true,        % false: boxed links; true: colored links
+    linkcolor=black,        % color of internal links
+    citecolor=green,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan,          % color of external links
+    unicode=true,           % non-Latin characters in Acrobat’s bookmarks
+    pdfstartview={FitH},    % fits the width of the page to the window
+    pdfnewwindow=true       % links in new window
+}
+\usepackage{paralist}
+
+%% tweak fonts
+\defaultfontfeatures{Mapping=tex-text}
+\setromanfont{Charis SIL}
+\setsansfont[Scale=MatchLowercase]{Helvetica Neue}
+\setmonofont[Scale=MatchLowercase]{Menlo}
+\linespread{1.25}
+
+%% define custom commands and environments
+\DefineVerbatimEnvironment%
+  {SmallVerbatim}%
+  {Verbatim}{fontsize=\relsize{-0.5},numbers=left,numbersep=-10pt,frame=lines,tabsize=4}
+
+\newcommand{\f}[1]{\texttt{#1}}
+\newcommand{\s}[1]{\textsf{#1}}
+
+\newcommand{\rev}{35c18ee3786b53133ca699f3f44c15e18e2d7a25}
+\newcommand{\revhref}[1] {\href{https://github.com/student-tomasz/pi-cwiczenie-4/blob/\rev/#1}{\f{#1}}}
+
+\begin{document}
+
+%%fakesection{Tytuł}
+\title{
+  Sprawozdanie z~ćwiczenia nr~4\\z~laboratorium Programowanie internetowe
+}
+\author{
+  Tomasz Cudziło\\
+  \textsc{PW EE Informatyka}\\[10pt]
+}
+\date{\today}
+\maketitle
+
+
+
+\section{Opis projektu}
+
+Celem ćwiczenia było stworzenie aplikacji pozwalającej na upload/download plików
+na/z serwera wykorzystując \f{PHP} i przechowując informacje o plikach w
+\f{MySQL}.
+
+\subsection{Kod źródłowy}
+\begin{description}
+  \item[Adres projektu:] \hfill \\
+  \url{http://volt.iem.pw.edu.pl/~cudzilot/pi/cw4/}
+  \item[Repozytorium projektu:] \hfill \\
+  \url{https://github.com/student-tomasz/pi-cwiczenie-4}
+  \item[Repozytorium sprawozdania:] \hfill \\
+  \url{https://github.com/student-tomasz/pi-sprawozdanie-4}
+\end{description}
+Stan projektu na czas pisania sprawozdania:
+\href{https://github.com/student-tomasz/pi-cwiczenie-4/tree/\rev}{\f{\rev}}.
+
+\subsection{Biblioteki}
+Wykorzystywane jest \emph{jQuery} \cite{jquery} do stworzenia odnośników do
+walidatorów kodu strony. Style \f{CSS} resetujące i normalizujące wszystkie
+elementy pochodzą z \emph{YUI 3} \cite{yui3}. Pozostałe reguły \f{CSS} dotyczące
+przycisków, formularzy i tabeli z plikami są silnie wzorowane na stylach z
+\emph{Twitter Bootstrap} \cite{bootstrap}.
+
+\subsection{Zgodność ze standardami}
+\f{HTML} powinien przechodzić walidację dla zadeklarowanego standardu \f{XHTML
+4.01 Strict}. \f{CSS} jest zgodny ze standardem \f{CSS 2.1}. Reguły opisujące
+przyciski formularzy, wykorzystują animacje oraz gradienty. Należą one do
+standardu \f{CSS 3}.
+
+Napisany \f{JavaScript} wykorzystuje klasy i metody wchodzące dopiero do użytku,
+wraz z ogólnie pojętym \f{HTML 5}. Nie miałem okazji poznać nowych możliwości
+\f{HTML 5}, więc wykorzystałem część z nich w tym projekcie. W dalszych
+paragrafach szczegółowo opisuję wykorzystane klasy.
+
+Ponieważ rozważane specyfikacje są młode strona działa poprawnie tylko w Mozilla
+Firefox 8.0+, Google Chrome 15+ oraz Safari 5.1+.
+
+
+
+\begin{thebibliography}{9}
+  \bibitem{jquery}
+    \url{http://jquery.com/}
+  \bibitem{yui3}
+    \url{http://yuilibrary.com/yui/docs/cssreset/}
+  \bibitem{bootstrap}
+    \url{http://twitter.github.com/bootstrap/}
+\end{thebibliography}
+
+
+
+\end{document}

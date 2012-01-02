@@ -56,11 +56,14 @@
 
 \section{Opis projektu}
 
+
 Celem ćwiczenia było stworzenie aplikacji pozwalającej na upload/download plików
 na/z serwera wykorzystując \f{PHP} i przechowując informacje o plikach w
 \f{MySQL}.
 
+
 \subsection{Kod źródłowy}
+
 \begin{description}
   \item[Adres projektu:] \hfill \\
   \url{http://volt.iem.pw.edu.pl/~cudzilot/pi/cw4/}
@@ -72,14 +75,18 @@ na/z serwera wykorzystując \f{PHP} i przechowując informacje o plikach w
 Stan projektu na czas pisania sprawozdania:
 \href{https://github.com/student-tomasz/pi-cwiczenie-4/tree/\rev}{\f{\rev}}.
 
+
 \subsection{Biblioteki}
-Wykorzystywane jest \emph{jQuery} \cite{jquery} do stworzenia odnośników do
-walidatorów kodu strony. Style \f{CSS} resetujące i normalizujące wszystkie
-elementy pochodzą z \emph{YUI 3} \cite{yui3}. Pozostałe reguły \f{CSS} dotyczące
+
+Wykorzystywane jest \emph{jQuery} \cite{jquery} do tworzenia odnośników do
+walidatorów. Style \f{CSS} resetujące i normalizujące wszystkie elementy
+pochodzą z \emph{YUI 3} \cite{yui3}. Pozostałe reguły \f{CSS} dotyczące
 przycisków, formularzy i tabeli z plikami są silnie wzorowane na stylach z
 \emph{Twitter Bootstrap} \cite{bootstrap}.
 
+
 \subsection{Zgodność ze standardami}
+
 \f{HTML} powinien przechodzić walidację dla zadeklarowanego standardu \f{XHTML
 4.01 Strict}. \f{CSS} jest zgodny ze standardem \f{CSS 2.1}. Reguły opisujące
 przyciski formularzy, wykorzystują animacje oraz gradienty. Należą one do
@@ -95,6 +102,164 @@ Firefox 8.0+, Google Chrome 15+ oraz Safari 5.1+.
 
 
 
+\section{Wykonanie}
+
+
+\subsection{Funkcje pomocnicze}
+
+Pliki \revhref{config.php}, \revhref{connect.php} i \revhref{disconnect.php}
+zawierają instrukcje pomocnicze.
+
+\revhref{config.php} tworzy \f{Array} ze zmiennymi potrzebnymi do połączenia z
+bazą danych i ścieżką docelową zapisu przesyłanych plików. Pliki
+\revhref{connect.php} i \revhref{disconnect.php} zawierają odpowiednio kod
+otwierający i kończący połączenie z bazą danych.
+
+Plik \revhref{sanitize.php} definiuje funkcję pomocniczą \f{sanitize()}, która
+jest prymitywnym sposobem na ignorowanie znaków. Zapewnia ona ignorowanie znaków
+mogących w niepożądany sposób wpłynąć na polecenia \f{PHP} lub zapytania
+\f{SQL}.
+
+
+\subsection{Lista plików}
+
+Za wyświetlanie listy plików, znajdujących się na serwerze, odpowiadają pliki
+\revhref{index.html}, \revhref{index.php} oraz \revhref{javascripts/updater.js}.
+
+Plik \revhref{index.html} jest statyczny. Zawiera formularz do wysyłania
+plików i pustą tabelę przeznaczoną na informacje o plikach na serwerze.
+
+Plik \revhref{index.php} służy do pobierania informacji o plikach znajdujących
+się na serwerze. Tworzone jest połączenie z bazą danych poprzez wczytanie pliku
+\revhref{connect.php}, następnie wykonywane jest zapytanie pobierające wszystkie
+wiersze z tabeli ćwiczenia. Iterując po otrzymanych wierszach, wypisywane są
+tagi \f{<tr>...</tr>} przeznaczone do tabeli w \revhref{index.html}.
+
+Oba te pliki łączy obiekt pseudo-klasy \f{Updater} zdefiniowany w pliku
+\revhref{javascripts/updater.js}. Prototyp \f{Updater} posiada metodę
+\f{update()}, która wysyła asynchronicznie żądanie \f{HTTP GET} do
+\revhref{index.php}. Serwer wypisuje jako treść odpowiedzi, opisany wyżej kod
+\f{HTML}. Gdy żądanie zostanie zakończone i status odpowiedzi jest równy \f{200
+OK} to otrzymany tekst, jest wstawiany do środka tabeli.
+
+Metoda \f{update()} jest wywoływana, gdy strona zostanie załadowana oraz gdy
+wysyłanie pliku zakończy się sukcesem.
+
+
+\subsection{Wysyłanie plików}
+
+Wysyłanie plików odbywa się poprzez formularz w pliku \revhref{index.html},
+obsługę zapytania w \revhref{upload.php} oraz wysłanie zapytania przez
+\revhref{javascripts/uploader.js}.
+
+\subsubsection{Przesyłanie plików przez \f{JavaScript}}
+
+Klasa \f{Uploader} posiada dwie metody: \f{fileSubmitted} oraz \f{fileChanged}.
+Metoda \f{fileChanged} jest wywoływana gdy zawartość pola wyboru pliku ulega
+zmianie. Blokuje ona możliwość wysłania pliku gdy, wybrany plik przekracza limit
+wielkości lub plik nie został wybrany. Metoda \f{fileSubmitted} jest wywoływana
+gdy użytkownik zdecyduje się wysłać plik. Jej schemat działania przedstawia blok
+pseudokodu:
+
+\begin{SmallVerbatim}
+    zignoruj zdarzenie
+    przestań propagować zdarzenie
+
+    if plik istnieje
+        zablokuj przycisk formularza
+        stworz obiekt zapytania asynchronicznego
+        uzupelnij naglowki zapytania
+        uzupelnij funkcje reagujace na zakonczenie zapytania
+        wyslij zapytanie
+    end
+\end{SmallVerbatim}
+
+Wyżej opisany kod korzysta z klas \f{JavaScript} opisanych w młodych
+specyfikacjach. Obiekt zapytania jest obiektem klasy \f{XMLHttpRequest} opisanej
+w specyfikacji \f{XMLHttpRequest Level 2} \cite{xhr}. Instancja pliku --- obiekt
+klasy \f{File} pochodzi ze specyfikacji \f{FileAPI} \cite{fileapi}.
+
+Ich połączenie pozwala na przesyłanie plików jako treść zapytania. Pozostałe
+dane o pliku --- jego nazwa i typ są przesyłane oddzielnie, w nagłówku
+zapytania. Wysyłanie pliku jest wykonywane asynchronicznie. Zapytanie dostaje
+anonimowe funkcje uruchamiane w przypadku powodzenia lub wystąpienia błędu.
+
+\subsubsection{Odbiór pliku przez serwer}
+
+Plik \revhref{upload.php} zachowuje się analogicznie do \revhref{index.php}.
+Inicjalizowane jest połączenie z bazą danych, dane z nagłówka są wstawiane do
+zapytania \f{SQL}. Przy pomyślnym wykonaniu utworzonego zapytania \f{SQL},
+tworzony jest nowy wiersz w tablicy, a plik zostaje zapisany na dysku.
+
+Odczytanie zawartości przesłanego pliku odbywa się w funkcji
+\f{file\_get\_contents('php://input')}. Argumentem jest nazwa specjalnego
+strumienia \f{php://input}, który w tym przypadku wskazuje na ciało
+\emph{(body)} zapytania.
+
+
+\subsection{Konwersja plików}
+
+Konwersja plików odbywa się za pomocą trzech plików: \revhref{convert.html},
+\revhref{convert.php} i \revhref{javascripts/converter.js}.
+
+Akcja konwersji kodowania pliku jest dostępna tylko dla plików tekstowych.
+Rozpoznanie typu pliku następuje bezpośrednio przed przesłaniem plików na
+serwer, za pomocą atrybutu \f{type} w obiektach klasy \f{File} z nowego
+\f{FileAPI} \cite{fileapi}. Typ pliku zapamiętywany jest w bazie danych.
+
+Po wyborze akcji \emph{konwertuj} pojawia się okno dialogowe, gdzie użytkownik
+wybiera kodowanie źródłowe i końcowe dla pliku, oraz potwierdza wykonanie lub
+anulowanie operacji. Oknem dialogowym zarządza metoda \f{Converter.convert(id)}
+zdefiniowana w \revhref{javascripts/converter.js}. Do pokazania okna dialogowego
+wykorzystywana jest, wchodząca do standardu, metoda \f{window.showModalDialog()}
+\cite{modal}.
+
+Do okna dialogowego przekazywane są id i nazwa pliku, a zwracane są żądane
+kodowania lub \f{false}, jeśli użytkownik anuluje/zamknie okno dialogowe.
+
+Posiadając id pliku, oraz kodowanie źródłowe i końcowe wysyłane jest zapytanie
+\f{HTTP POST} do \revhref{convert.php}, gdzie wywoływana jest funkcja \f{iconv}
+z podanymi argumentami.
+
+
+\subsection{Usuwanie plików}
+
+Usuwanie plików działa identycznie jak przesyłanie plików na serwer. Różnicą
+jest tylko treść i cel wysyłanego zapytania. Obiekt zapytania tworzony jest w
+\revhref{javascripts/destroyer.js}. Metoda \f{destroy()} wysyła zapytanie typu
+\f{POST} do \revhref{destroy.php}. Zawartością zapytania jest instancja klasy
+\f{FormData} \cite{formdata} zawierająca id pliku.
+
+Po otrzymaniu zapytania, \revhref{destroy.php} sprawdza, czy plik istnieje, a
+następnie usuwa wiersz z tablicy oraz plik z dysku.
+
+
+\subsection{Pobieranie plików}
+
+Pobieranie plików polega na wysłaniu zapytania \f{GET}. Standardowo, przez
+kliknięcie odnośnika w oknie przeglądarki. Zwracana jest odpowiedź z ręcznie
+spreparowanym nagłówkiem, informującym przeglądarkę, że przesyłany jest plik.
+Ciałem odpowiedzi jest żądany plik. Jeżeli plik o danym \f{id} nie istnieje,
+zwracana jest pusta odpowiedź z kodem \f{404 Not Found}.
+
+
+
+\section{Wnioski}
+
+Tworzenie nawet prostych aplikacji w \f{PHP} bez wsparcia bibliotek zewnętrznych
+albo frameworków takich jak \emph{CakePHP} jest dosyć uciążliwe.
+
+Konieczne jest ciągłe walidowanie danych wprowadzane przez użytkownika.
+Zarządzanie bazą danych jest uciążliwe, trzeba nawiązywać połączenie za każdym
+razem, a przy zmianie silnika bazy danych upewnić się, że zapytania \f{SQL} będą
+działały poprawnie.
+
+Zaimponowały mi nowe możliwości udostępniane przez \f{JavaScript}, zwłaszcza
+obsługa plików po stronie klienta, oraz niemal natywne okna dialogowe o dowolnej
+zawartości.
+
+
+
 \begin{thebibliography}{9}
   \bibitem{jquery}
     \url{http://jquery.com/}
@@ -102,6 +267,14 @@ Firefox 8.0+, Google Chrome 15+ oraz Safari 5.1+.
     \url{http://yuilibrary.com/yui/docs/cssreset/}
   \bibitem{bootstrap}
     \url{http://twitter.github.com/bootstrap/}
+  \bibitem{xhr}
+    \url{http://www.w3.org/TR/XMLHttpRequest2/#the-send-method}
+  \bibitem{fileapi}
+    \url{http://www.w3.org/TR/FileAPI/}
+  \bibitem{modal}
+    \url{https://developer.mozilla.org/en/DOM/window.showModalDialog}
+  \bibitem{formdata}
+    \url{http://www.w3.org/TR/XMLHttpRequest2/#the-formdata-interface}
 \end{thebibliography}
 
 
